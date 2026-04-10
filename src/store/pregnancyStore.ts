@@ -34,6 +34,7 @@ export interface UserProfile {
   heightCm: number | null;
   language: 'he' | 'en';
   hasCompletedOnboarding: boolean;
+  numberOfFetuses: 1 | 2 | 3;
 }
 
 export interface NotificationPreferences {
@@ -78,6 +79,7 @@ const defaultProfile: UserProfile = {
   heightCm: null,
   language: 'he',
   hasCompletedOnboarding: false,
+  numberOfFetuses: 1,
 };
 
 export const usePregnancyStore = create<PregnancyState>((set, get) => ({

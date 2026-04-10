@@ -27,7 +27,11 @@
     "prePregnancyWeight": "Pre-pregnancy weight (kg)",
     "height": "Height (cm)",
     "getStarted": "Get Started",
-    "embryoAge": "Embryo age at transfer (days)"
+    "embryoAge": "Embryo age at transfer (days)",
+    "multipleTitle": "Multiple pregnancy?",
+    "singleton": "Single baby",
+    "twins": "Twins",
+    "triplets": "Triplets"
   },
   "tabs": {
     "home": "Home",

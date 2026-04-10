@@ -47,6 +47,7 @@ export default function OnboardingScreen() {
   const [partnerName, setPartnerName] = useState('');
   const [preWeight, setPreWeight] = useState('');
   const [height, setHeight] = useState('');
+  const [numberOfFetuses, setNumberOfFetuses] = useState<1 | 2 | 3>(1);
 
   const textAlign = isRTL ? 'right' : 'left';
 
@@ -122,6 +123,7 @@ export default function OnboardingScreen() {
       partnerName,
       prePregnancyWeightKg: weightNum,
       heightCm: heightNum,
+      numberOfFetuses,
       hasCompletedOnboarding: true,
     });
 
@@ -366,6 +368,31 @@ export default function OnboardingScreen() {
           accessibilityLabel="Height in centimeters"
         />
 
+        <Text style={[styles.label, { textAlign }]}>{t('onboarding.multipleTitle')}</Text>
+        <View style={styles.fetusRow}>
+          {([1, 2, 3] as (1 | 2 | 3)[]).map((n) => {
+            const labels: Record<number, string> = {
+              1: t('onboarding.singleton'),
+              2: t('onboarding.twins'),
+              3: t('onboarding.triplets'),
+            };
+            const emojis: Record<number, string> = { 1: '👶', 2: '👶👶', 3: '👶👶👶' };
+            return (
+              <TouchableOpacity
+                key={n}
+                style={[styles.fetusButton, numberOfFetuses === n && styles.fetusButtonActive]}
+                onPress={() => setNumberOfFetuses(n)}
+                accessibilityLabel={labels[n]}
+              >
+                <Text style={styles.fetusEmoji}>{emojis[n]}</Text>
+                <Text style={[styles.fetusLabel, numberOfFetuses === n && styles.fetusLabelActive]}>
+                  {labels[n]}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
         <TouchableOpacity
           style={styles.primaryButton}
           onPress={handleFinish}
@@ -512,6 +539,38 @@ const styles = StyleSheet.create({
   backButtonText: {
     fontSize: 16,
     fontFamily: 'Nunito_600SemiBold',
+    color: '#E8A598',
+  },
+  fetusRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+    gap: 10,
+  },
+  fetusButton: {
+    flex: 1,
+    borderWidth: 2,
+    borderColor: '#F0DED8',
+    borderRadius: 16,
+    paddingVertical: 14,
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+  },
+  fetusButtonActive: {
+    borderColor: '#E8A598',
+    backgroundColor: '#FFF0EC',
+  },
+  fetusEmoji: {
+    fontSize: 22,
+    marginBottom: 4,
+  },
+  fetusLabel: {
+    fontSize: 13,
+    fontFamily: 'Nunito_600SemiBold',
+    color: '#7A5C5C',
+    textAlign: 'center',
+  },
+  fetusLabelActive: {
     color: '#E8A598',
   },
 });
