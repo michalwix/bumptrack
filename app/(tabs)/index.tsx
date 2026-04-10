@@ -52,6 +52,15 @@ export default function HomeScreen() {
               ? 'כדי להתחיל, צריך להגדיר את תאריך הלידה'
               : 'To get started, please complete your profile setup'}
           </Text>
+          <TouchableOpacity
+            style={styles.setupButton}
+            onPress={() => router.push('/onboarding')}
+            accessibilityLabel="Set up profile"
+          >
+            <Text style={styles.setupButtonText}>
+              {language === 'he' ? 'הגדרת פרופיל' : 'Set Up Profile'}
+            </Text>
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
     );
@@ -252,6 +261,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Nunito_400Regular',
     color: '#7A5C5C',
+    marginBottom: 32,
+  },
+  setupButton: {
+    backgroundColor: '#E8A598',
+    paddingHorizontal: 36,
+    paddingVertical: 14,
+    borderRadius: 28,
+  },
+  setupButtonText: {
+    fontSize: 16,
+    fontFamily: 'Nunito_700Bold',
+    color: '#FFFFFF',
   },
   scrollContent: {
     paddingHorizontal: 20,
