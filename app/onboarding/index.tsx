@@ -60,6 +60,8 @@ export default function OnboardingScreen() {
     const month = parseInt(parts[1], 10) - 1;
     const year = parseInt(parts[2], 10);
     if (isNaN(day) || isNaN(month) || isNaN(year)) return null;
+    // Reject obviously wrong years (must be 4-digit, between 2000–2100)
+    if (year < 2000 || year > 2100) return null;
     const date = new Date(year, month, day);
     if (isNaN(date.getTime())) return null;
     return date;

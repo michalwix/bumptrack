@@ -23,7 +23,7 @@ export function usePregnancy() {
   );
 
   const currentWeek = useMemo(
-    () => (lmpDate ? calculateCurrentWeek(lmpDate) : 0),
+    () => (lmpDate ? Math.min(Math.max(calculateCurrentWeek(lmpDate), 1), 40) : 0),
     [lmpDate]
   );
 

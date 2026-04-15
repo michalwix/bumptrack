@@ -27,6 +27,7 @@ export default function HomeScreen() {
   const { t, language, isRTL } = useI18n();
   const {
     profile,
+    dueDate,
     currentWeek,
     currentDay,
     daysUntilDue,
@@ -123,13 +124,25 @@ export default function HomeScreen() {
             </Text>
           )}
 
-          {daysUntilDue !== null && daysUntilDue >= 0 && (
+          {dueDate && (
             <View style={styles.countdownContainer}>
-              <Text style={[styles.countdownNumber, { textAlign: 'center' }]}>
-                {daysUntilDue}
-              </Text>
-              <Text style={[styles.countdownLabel, { textAlign: 'center' }]}>
-                {t('home.daysUntilBirth')}
+              {daysUntilDue !== null && daysUntilDue >= 0 && (
+                <>
+                  <Text style={[styles.countdownNumber, { textAlign: 'center' }]}>
+                    {daysUntilDue}
+                  </Text>
+                  <Text style={[styles.countdownLabel, { textAlign: 'center' }]}>
+                    {t('home.daysUntilBirth')}
+                  </Text>
+                </>
+              )}
+              <Text style={[styles.dueDateText, { textAlign: 'center' }]}>
+                {language === 'he' ? 'תאריך לידה משוער: ' : 'Due date: '}
+                {dueDate.toLocaleDateString(language === 'he' ? 'he-IL' : 'en-GB', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                })}
               </Text>
             </View>
           )}
@@ -354,6 +367,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Nunito_400Regular',
     color: '#7A5C5C',
+  },
+  dueDateText: {
+    fontSize: 13,
+    fontFamily: 'Nunito_600SemiBold',
+    color: '#E8A598',
+    marginTop: 6,
   },
   sectionCard: {
     backgroundColor: '#FFFFFF',
