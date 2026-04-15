@@ -77,14 +77,13 @@ export default function HomeScreen() {
   const trimesterColor =
     trimester === 1 ? '#A8C5A0' : trimester === 2 ? '#E8A598' : '#C4A0C0';
 
-  // Get next incomplete required checklist items
+  // Show incomplete tasks: overdue by up to 3 weeks, or upcoming in next 6 weeks
   const upcomingItems = checklistItems
-    .filter((item) => {
-      const trimesterMatch =
-        item.trimester === trimester ||
-        (item.trimester === trimester + 1 && currentWeek >= item.weekDue - 2);
-      return trimesterMatch && !checklistState[item.id] && item.weekDue >= currentWeek;
-    })
+    .filter((item) =>
+      !checklistState[item.id] &&
+      item.weekDue >= currentWeek - 3 &&
+      item.weekDue <= currentWeek + 6
+    )
     .sort((a, b) => a.weekDue - b.weekDue)
     .slice(0, 3);
 
