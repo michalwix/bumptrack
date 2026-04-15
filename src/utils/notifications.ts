@@ -1,17 +1,23 @@
 import * as Notifications from 'expo-notifications';
+import { Platform } from 'react-native';
 import { addDays } from 'date-fns';
 import i18n from '../i18n';
 import { calculateCurrentWeek } from './dateCalculations';
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
+const isNative = Platform.OS !== 'web';
+
+if (isNative) {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    }),
+  });
+}
 
 export async function requestNotificationPermissions(): Promise<boolean> {
+  if (!isNative) return false;
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
   let finalStatus = existingStatus;
   if (existingStatus !== 'granted') {
@@ -22,6 +28,7 @@ export async function requestNotificationPermissions(): Promise<boolean> {
 }
 
 export async function scheduleWeeklyNotifications(lmpDate: Date): Promise<void> {
+  if (!isNative) return;
   await Notifications.cancelAllScheduledNotificationsAsync();
 
   const currentWeek = calculateCurrentWeek(lmpDate);
@@ -66,6 +73,7 @@ export async function scheduleWeeklyNotifications(lmpDate: Date): Promise<void> 
 }
 
 export async function scheduleKickCountReminders(lmpDate: Date): Promise<void> {
+  if (!isNative) return;
   const currentWeek = calculateCurrentWeek(lmpDate);
   if (currentWeek < 28) return;
 
