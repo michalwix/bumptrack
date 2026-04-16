@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -50,6 +50,14 @@ export default function OnboardingScreen() {
   const [numberOfFetuses, setNumberOfFetuses] = useState<1 | 2 | 3>(1);
 
   const textAlign = isRTL ? 'right' : 'left';
+
+  // Auto-format: inserts slashes as user types digits
+  function formatDateInput(raw: string): string {
+    const digits = raw.replace(/\D/g, '').slice(0, 8);
+    if (digits.length <= 2) return digits;
+    if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+    return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+  }
 
   function parseDate(input: string): Date | null {
     // Accept DD/MM/YYYY or DD-MM-YYYY
@@ -140,6 +148,34 @@ export default function OnboardingScreen() {
 
     router.replace('/(tabs)');
   }
+
+  // Live due date preview as user types
+  const previewDueDate = useMemo<Date | null>(() => {
+    try {
+      if (dateMethod === 'lmp') {
+        const d = parseDate(lmpInput);
+        return d ? calculateDueDate(d) : null;
+      }
+      if (dateMethod === 'dueDate') {
+        return parseDate(dueDateInput);
+      }
+      if (dateMethod === 'ivf') {
+        const d = parseDate(ivfInput);
+        if (!d) return null;
+        const age = parseInt(embryoAge, 10) || 5;
+        return calculateDueDate(getLMPFromIVF(d, age));
+      }
+    } catch {
+      return null;
+    }
+    return null;
+  }, [lmpInput, dueDateInput, ivfInput, embryoAge, dateMethod]);
+
+  const previewDueDateStr = previewDueDate
+    ? previewDueDate.toLocaleDateString(language === 'he' ? 'he-IL' : 'en-GB', {
+        day: 'numeric', month: 'long', year: 'numeric',
+      })
+    : null;
 
   // ─── Language Step ────────────────────────────────────────────────────────
   if (step === 'language') {
@@ -236,7 +272,7 @@ export default function OnboardingScreen() {
   if (step === 'dateInput') {
     return (
       <SafeAreaView style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
           <TouchableOpacity
             style={styles.backButton}
             onPress={() => setStep('dateMethod')}
@@ -250,12 +286,13 @@ export default function OnboardingScreen() {
               <Text style={[styles.title, { textAlign }]}>{t('onboarding.lmpTitle')}</Text>
               <Text style={[styles.subtitle, { textAlign }]}>{t('onboarding.lmpSubtitle')}</Text>
               <TextInput
-                style={[styles.input, { textAlign }]}
-                placeholder="DD/MM/YYYY"
+                style={[styles.dateInput, { textAlign: 'center' }]}
+                placeholder="DD / MM / YYYY"
                 placeholderTextColor="#B8A0A0"
                 value={lmpInput}
-                onChangeText={setLmpInput}
-                keyboardType="numeric"
+                onChangeText={(v) => setLmpInput(formatDateInput(v))}
+                keyboardType="number-pad"
+                maxLength={10}
                 accessibilityLabel="Last menstrual period date"
               />
             </>
@@ -265,12 +302,13 @@ export default function OnboardingScreen() {
             <>
               <Text style={[styles.title, { textAlign }]}>{t('onboarding.dueDateTitle')}</Text>
               <TextInput
-                style={[styles.input, { textAlign }]}
-                placeholder="DD/MM/YYYY"
+                style={[styles.dateInput, { textAlign: 'center' }]}
+                placeholder="DD / MM / YYYY"
                 placeholderTextColor="#B8A0A0"
                 value={dueDateInput}
-                onChangeText={setDueDateInput}
-                keyboardType="numeric"
+                onChangeText={(v) => setDueDateInput(formatDateInput(v))}
+                keyboardType="number-pad"
+                maxLength={10}
                 accessibilityLabel="Due date"
               />
             </>
@@ -280,29 +318,49 @@ export default function OnboardingScreen() {
             <>
               <Text style={[styles.title, { textAlign }]}>{t('onboarding.ivfTitle')}</Text>
               <TextInput
-                style={[styles.input, { textAlign }]}
-                placeholder="DD/MM/YYYY"
+                style={[styles.dateInput, { textAlign: 'center' }]}
+                placeholder="DD / MM / YYYY"
                 placeholderTextColor="#B8A0A0"
                 value={ivfInput}
-                onChangeText={setIvfInput}
-                keyboardType="numeric"
+                onChangeText={(v) => setIvfInput(formatDateInput(v))}
+                keyboardType="number-pad"
+                maxLength={10}
                 accessibilityLabel="IVF transfer date"
               />
               <Text style={[styles.label, { textAlign }]}>{t('onboarding.embryoAge')}</Text>
               <TextInput
-                style={[styles.input, { textAlign }]}
+                style={[styles.input, { textAlign: 'center' }]}
                 placeholder="5"
                 placeholderTextColor="#B8A0A0"
                 value={embryoAge}
                 onChangeText={setEmbryoAge}
-                keyboardType="numeric"
+                keyboardType="number-pad"
+                maxLength={2}
                 accessibilityLabel="Embryo age at transfer in days"
               />
             </>
           )}
 
+          {/* Live due date preview */}
+          {previewDueDateStr ? (
+            <View style={styles.dueDatePreview}>
+              <Text style={[styles.dueDatePreviewLabel, { textAlign: 'center' }]}>
+                {language === 'he' ? '🗓 תאריך לידה משוער' : '🗓 Estimated due date'}
+              </Text>
+              <Text style={[styles.dueDatePreviewDate, { textAlign: 'center' }]}>
+                {previewDueDateStr}
+              </Text>
+            </View>
+          ) : (
+            <View style={styles.dueDatePlaceholder}>
+              <Text style={[styles.dueDatePlaceholderText, { textAlign: 'center' }]}>
+                {language === 'he' ? 'הכניסי תאריך לחישוב תאריך הלידה' : 'Enter date to calculate due date'}
+              </Text>
+            </View>
+          )}
+
           <TouchableOpacity
-            style={styles.primaryButton}
+            style={[styles.primaryButton, !previewDueDateStr && styles.primaryButtonDisabled]}
             onPress={handleDateInputContinue}
             accessibilityLabel="Continue to profile setup"
           >
@@ -518,6 +576,52 @@ const styles = StyleSheet.create({
     color: '#3D2C2C',
     marginBottom: 16,
   },
+  dateInput: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 2,
+    borderColor: '#E8A598',
+    borderRadius: 16,
+    paddingHorizontal: 20,
+    paddingVertical: Platform.OS === 'ios' ? 20 : 16,
+    fontSize: 28,
+    fontFamily: 'Nunito_700Bold',
+    color: '#3D2C2C',
+    marginBottom: 16,
+    letterSpacing: 4,
+  },
+  dueDatePreview: {
+    backgroundColor: '#FFF0EC',
+    borderRadius: 16,
+    padding: 18,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#F0DED8',
+  },
+  dueDatePreviewLabel: {
+    fontSize: 13,
+    fontFamily: 'Nunito_600SemiBold',
+    color: '#7A5C5C',
+    marginBottom: 6,
+  },
+  dueDatePreviewDate: {
+    fontSize: 20,
+    fontFamily: 'Nunito_700Bold',
+    color: '#E8A598',
+  },
+  dueDatePlaceholder: {
+    backgroundColor: '#FAF4F0',
+    borderRadius: 16,
+    padding: 18,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#F0DED8',
+    borderStyle: 'dashed',
+  },
+  dueDatePlaceholderText: {
+    fontSize: 14,
+    fontFamily: 'Nunito_400Regular',
+    color: '#B8A0A0',
+  },
   primaryButton: {
     backgroundColor: '#E8A598',
     borderRadius: 16,
@@ -529,6 +633,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 4,
+  },
+  primaryButtonDisabled: {
+    backgroundColor: '#D4B8B2',
+    shadowOpacity: 0,
+    elevation: 0,
   },
   primaryButtonText: {
     fontSize: 17,
