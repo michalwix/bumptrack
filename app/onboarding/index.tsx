@@ -330,7 +330,7 @@ export default function OnboardingScreen() {
               <Text style={[styles.label, { textAlign }]}>{t('onboarding.embryoAge')}</Text>
               <TextInput
                 style={[styles.input, { textAlign: 'center' }]}
-                placeholder="5"
+                placeholder={language === 'he' ? '5 (בלסטוציסט)' : '5 (blastocyst)'}
                 placeholderTextColor="#B8A0A0"
                 value={embryoAge}
                 onChangeText={setEmbryoAge}
@@ -338,6 +338,11 @@ export default function OnboardingScreen() {
                 maxLength={2}
                 accessibilityLabel="Embryo age at transfer in days"
               />
+              <Text style={[styles.helperText, { textAlign }]}>
+                {language === 'he'
+                  ? 'ברירת מחדל: 5 ימים (בלסטוציסט). אם עובר יום 3 — הכניסי 3'
+                  : 'Default: 5 days (blastocyst). If day-3 embryo — enter 3'}
+              </Text>
             </>
           )}
 
@@ -683,5 +688,13 @@ const styles = StyleSheet.create({
   },
   fetusLabelActive: {
     color: '#E8A598',
+  },
+  helperText: {
+    fontSize: 12,
+    fontFamily: 'Nunito_400Regular',
+    color: '#7A5C5C',
+    marginTop: -10,
+    marginBottom: 16,
+    opacity: 0.8,
   },
 });
