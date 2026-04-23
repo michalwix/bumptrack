@@ -128,7 +128,6 @@ export default function ChecklistScreen() {
           >
             <Text
               style={[styles.tabText, activeTab === tab.key && styles.tabTextActive]}
-              numberOfLines={1}
             >
               {tab.label}
             </Text>
@@ -210,13 +209,14 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   tab: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
     backgroundColor: '#FFFFFF',
     borderWidth: 1.5,
     borderColor: '#F0DED8',
     marginHorizontal: 4,
+    flexShrink: 0,
   },
   tabActive: {
     backgroundColor: '#E8A598',
