@@ -163,6 +163,17 @@ export default function SettingsScreen() {
               </View>
             </View>
           )}
+
+          <TouchableOpacity
+            style={styles.editProfileButton}
+            onPress={() => router.push('/onboarding')}
+            accessibilityLabel="Edit profile"
+          >
+            <Ionicons name="create-outline" size={18} color="#FFFFFF" />
+            <Text style={styles.editProfileButtonText}>
+              {isRTL ? 'ערכי פרופיל' : 'Edit Profile'}
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {/* About Section */}
@@ -295,5 +306,25 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: 'Nunito_600SemiBold',
     color: '#CC6666',
+  },
+  editProfileButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#E8A598',
+    borderRadius: 14,
+    paddingVertical: 12,
+    marginTop: 12,
+    gap: 8,
+    shadowColor: '#E8A598',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  editProfileButtonText: {
+    fontSize: 15,
+    fontFamily: 'Nunito_700Bold',
+    color: '#FFFFFF',
   },
 });
